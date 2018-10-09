@@ -1,0 +1,106 @@
+
+    <style type=text/css>
+    
+    #bar1{
+        float:left;
+        width:180px;
+        height:30px;
+        text-align:center;
+        font-family: Arial, Helvetica, sans-serif;
+        border-left:solid 1px whitesmoke;
+        border-top:solid 1px whitesmoke;
+        border-right:solid 1px whitesmoke;
+        cursor:pointer;
+        }
+    #bar2{
+        float:left;
+        width:180px;
+        height:30px;
+        text-align:center;
+        
+        border-left:none;
+        border-top:solid 1px whitesmoke;
+        border-right:solid 1px whitesmoke;
+        cursor:pointer;
+    
+    }
+    .baron{
+        background-color:white;
+        border-bottom:none;
+        
+    }
+    .baroff{
+        background-color:#F2F2F2;
+        border-bottom:solid 1px whitesmoke;
+        
+    }
+    </style>    
+    
+    <div style="height:25px;width:100%;background-color:black;text-align:right;color:whitesmoke;font-size:14px">
+        <span style="cursor:pointer" onclick="closepop()"> X </span>&nbsp;&nbsp;&nbsp;&nbsp;
+    </div>   
+    <h3 class=normal>New Audio Book</h2>
+      <div id=newbars style="text-align:right;width:100%;margin-left:40px;">
+          <div id=bar1 class="baron" onclick="dobar(1)">Audio Info</div>
+          <div id=bar2 class="baroff" onclick="dobar(2)">Get Info From</div>
+      </div>
+      <br/>
+      <div style="width:100%;text-align:right;margin-left:40px;">
+      <div style="width:88%;text-align:center;border:solid 1px whitesmoke;display:'';">
+        <form name=newfrm id='newfrm'>
+            <table id= newform1 cellpadding=0 cellspacing=10 width=100% align=center class=contxt style="margin-right:40px;">
+                <tr><td colspan=2 height=20>&nbsp;</td></tr>
+                <tr>
+                    <td width=150 align=right height=25 class="contxt">Name:</td>
+                    <td width=400 align=left><input name="bookname" type="text" size=45><input name="bookfolder" type="hidden" value=""></td>
+                </tr>
+                <tr>
+                    <td width=150 align=right height=25 class="contxt">Author:</td>
+                    <td width=400 align=left><input name="bookauthor" type="text" size=40></td>
+                </tr>
+                <tr>
+                    <td width=150 align=right height=25 class="contxt">Reader:</td>
+                    <td width=400 align=left><input name="bookreader" type="text" size=40></td>
+                </tr>
+                <tr>
+                    <td width=150 align=right height=25 class="contxt">Length:</td>
+                    <td width=400 align=left><input name="booklength" type="text" size=40></td>
+                </tr>
+                <tr>
+                    <td width=150 align=right height=25 class="contxt">Release:</td>
+                    <td width=400 align=left><input name="bookrelease" type="text" size=40></td>
+                </tr>
+                <tr>
+                    <td width=150 align=right height=25 class="contxt">Language:</td>
+                    <td width=400 align=left>
+                        <select name=listlanguage onchange="newfrm.booklanguage.value=this.value;">
+                            <option value='English' selected>English</option>
+                            <option value='German' >German</option>
+                            <option value='Japanese'>Japanese</option>
+                        </select>
+                        <input name="booklanguage" type="hidden" size=40 value="English"></td>
+                </tr>
+                <tr>
+                    <td width=150 align=right height=25 class="contxt">Publisher:</td>
+                    <td width=400 align=left><input name="bookpublisher" type="text" size=40></td>
+                </tr>
+                <tr><td colspan=2 height=20>&nbsp;</td></tr>
+                <tr><td></td><td height=20 align=right><input type=button value="save book info" onclick="savebookinfo('newfrm')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+            </table>
+           
+            
+        </form>
+        <div id=newform2 style="display:none;width:100%;text-align:center;margin-top:40px;margin-bottom:40px;">
+            <form name=newfrm2>
+                <textarea id=cliptxt name="cliptxt" value="" cols=50 rows=20></textarea>
+                <br><br>
+                <span class=contxt>tips: copy info from Audio.com, and then paste it here.</span>
+                <br><br>
+                <input type=button id=audiblebutton value="Click here Get Info" onclick="getaudibleinfo(newfrm2.cliptxt.value)">
+            </form>
+            </div> 
+    </div>
+    </div>
+     
+
+       

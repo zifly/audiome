@@ -1,0 +1,82 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<link rel="stylesheet" href="./style1.css" type="text/css" />
+<script language=javascript src="../lib/jquery-1.9.1.js"></script>
+<script language=javascript src="../lib/player.js"></script>
+<script language=javascript src="../lib/action.js"></script>
+</head>
+<body topmargin=0 leftmargin=0 style="width:100%">
+    <div id=leftframe>aaa</div>
+    <div id=mainframe>
+        <div class=biglogo><img src="./images/audio-logo.png" border=0></div>
+        <h1 class=normal>Why Me?</h2>
+        <div id=searchframe>
+            <input id=searchbox name=searchbox type=text size=60>
+        </div>
+        <div class=maindo>
+            <table cellpadding=0 cellspacing=10 width=40% align=center>
+                <tr>
+                    <td width=15% align=center><img id="newbookimg" src="./images/audio-listen.png" border=0 width=40 height=40></a></td>
+                    <td width=15% align=center><img src="./images/audio-note.png" border=0 width=40 height=40></td>
+                    <td width=15% align=center><img src="./images/audio-book.png" border=0 width=40 height=40></td>
+                    <td width=15% align=center><img src="./images/audio-down.png" border=0 width=40 height=40></td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+    <div><audio id="bgMusic"></audio></div>
+    
+    <div id=bottomframe>
+        <div class=musiccontrol>
+            <table cellpadding=0 cellspacing=10 border=0 width=100% height=80>
+                <tr>
+                    <td width=60 height=60 align=center valign=center>
+                        <img src="./images/coverbg.jpg" border=0 width=60 height=60>
+                    </td>
+                    <td>
+                        <table cellpadding=0 cellspacing=10 border=0 width=200>
+                            <tr>
+                                <td valign=center align=center><div class=circle-play2  onclick="javascript:prev()"><img src="./images/left-1.png" class=player2></div></td>
+                                <td valign=center align=center class=circle-play1><img src="./images/play_2.png" class=player1  onclick="javascript:goto2()"></td>
+                                <td valign=center align=center><div class=circle-play2 onclick="javascript:repeat()"><img src="./images/right-1.png" class=player2></div></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class=musicbar>
+            <table cellpadding=0 cellspacing=5 border=0 valign=center width=100%>
+                <tr>   
+                    <td width=100%>
+                        <table cellpadding=0 cellspacing=0 border=0 width=100%>
+                            <tr>
+                                <td id="musictitle" class=musictitle nowrap>this is title</td>
+                                <td id="musiccurrent" class="musiccurrent"  nowrap>00:00:00</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="musicprocess" class="musicprocess"></td>
+                 </tr>
+            </table>
+        </div>
+        
+    </div>
+    <div id=popwin align=center></div>
+</body>
+</html>
+<script>
+
+
+</script>
+<script src="../lib/default-render.js"></script>

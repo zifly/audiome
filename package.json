@@ -1,0 +1,16 @@
+{
+  "name": "audiome",
+  "version": "0.0.1",
+  "description": "audiobook player",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+
+  },
+  "author": "Yu Yi",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^3.0.2"
+  }
+}

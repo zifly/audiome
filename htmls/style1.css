@@ -1,0 +1,447 @@
+/*---------标题------------*/
+/*文前版权信息*/
+h1.front1{
+color:#F3BD3D;
+font-size:1.3em;
+text-align: left;
+text-indent:1em;
+font-weight:bold;
+margin-top:1.5em;
+margin-bottom:1.5em;
+}
+/*文前标题*/
+h1.front{
+color:#a23234;
+font-size:1.62rem;
+text-align:center;
+text-indent:0em;
+font-weight:bold;
+margin:1.5em auto 2.5em auto;
+padding-bottom:0.5em;
+margin-top:1.5em;
+margin-bottom:1.5em;
+}
+/*一级标题*/
+h1.zw-text1{
+text-align:center;
+color:#ffffff;
+font-size:1.5em;
+text-align: center;
+margin:1em auto 1.5em auto;
+background-color: #a23234;
+border:1px solid #a23234;
+font-weight:bold;
+}
+h1{
+text-align:center;
+font-size:1.3em;
+}
+h1.normal{
+    text-align:center;
+    font-size:1.8em; 
+}
+/*二级标题*/
+h2{
+text-align: left;
+color: #a23234;
+font-size: 1.2em;
+margin-top: 1em;
+margin-bottom: 2em;
+border-left: 5px solid #a23234;
+border-bottom: 1px solid #a23234;
+padding-left:0.5em;
+padding-bottom:0.2em;
+}
+h2.normal{
+    text-align: center;
+    color: #000000;
+    font-size: 1.5em;
+    margin-top: 1em;
+    margin-bottom: 2em;
+    border-left: 0;
+    border-bottom: 0;
+    padding-left:0.5em;
+    padding-bottom:0.2em;
+    }
+/*三级标题*/
+h3{
+text-align:center;
+color: #a23234;
+font-weight:bold;
+font-size:1em;
+margin-top:1.5em;
+margin-bottom:1em;
+}
+/*四级标题*/
+h4{
+text-align:left;
+font-weight:bold;
+font-size:1rem;
+margin-top:1.5em;
+margin-bottom:1em;
+}
+/*五级标题*/
+h5{
+text-align:left;
+font-weight:bold;
+font-size:0.88rem;
+margin-top:0.8em;
+margin-bottom:0.5em;
+}
+/*文后标题*/
+h1.back{
+color:#a23234;
+font-size:1.75rem;
+text-align:center;
+text-indent:0em;
+margin:1.5em auto 2.5em auto;
+padding-bottom:0.5em;
+margin-left:auto;
+margin-right:auto;
+font-weight:bold;
+}
+
+/*---------图片------------*/
+/*居中插图*/
+div.body-imagediv-alone{
+margin:0.2em auto 1.2em auto;
+text-align:center;
+width:80%;
+text-indent:0em;
+}
+img.body-image-alone{
+font-size:1rem;
+width:80%;
+margin-bottom:0.2em;
+}
+/*图说*/
+.img{
+font-size:0.85em;
+text-align:center;
+text-indent:0em;
+margin-top:0.5em;
+margin-bottom:2em;
+}
+/*图片居右文字环绕*/
+div.image-right {
+float: right;
+font-size: 1rem;
+margin: 0em 0em 0.2em 1em;
+width: 40%;
+}
+/*图片居左文字环绕*/
+div.image-left{
+float: left;
+font-size: 1rem;
+margin: 2em 1em 1em 0em;
+width: 50%;
+}
+/*段内补字*/
+.inline{
+height:1.0em;
+margin-bottom:-0.1em;
+}
+/*段内其他*/
+.inline1{
+height:2.0em;
+margin-bottom:-0.1em;
+}
+/*---------段落字号颜色变化------------*/
+/*局部引文颜色*/
+.part-textc{
+color:#F89363;
+}
+/*局部引文字号*/
+.part-textf{
+font-size:0.75em;
+}
+/*首字突出*/
+span.dyfirstLetter{
+float:left;
+font-size:280%;
+font-weight:bold;
+color:#008B8B;
+text-transform:uppercase;
+line-height:1em;
+}
+/*---------段落样式变化------------*/
+/*段落居中*/
+.center{
+text-align:center;
+text-indent:0em;
+margin-left:0%;
+margin-right:0%;
+}
+/*段落居左*/
+.left{
+text-indent:0em;
+margin-left:0%;
+margin-right:0%;
+}
+/*段落居右*/
+.right{
+text-align:right;
+margin-left:0%;
+margin-right:0%;
+}
+/*引文左侧加|*/
+.block{
+margin-left: 2em;
+    margin-right: 2em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    line-height: 150%;
+    border-left: 2px solid;
+    font-size: 0.9em;
+    padding-left: 0.5em;
+    text-align: justify;
+}
+/*引文0.9号字*/
+.block4
+{
+margin-left: 2em;
+    margin-right: 2em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    line-height: 150%;
+    font-size: 0.9em;
+    padding-left: 0.5em;
+    text-align: justify;
+    font-family:Kaiti;
+}
+/*引文居右*/
+.block1
+{
+font-size:0.9em;
+text-align:right;
+margin-right:0%;
+margin-left:0%;
+    font-family:Kaiti;
+}
+/*引文居中*/
+.block2
+{
+font-size:0.9em;
+text-indent:0em;
+text-align:center;
+margin-left:0%;
+margin-right:0%;
+    font-family:Kaiti;
+}
+/*引文居左*/
+.block3
+{
+font-size:0.9em;
+text-align:left;
+text-indent:0em;
+margin-left:0%;
+margin-right:0%;
+    font-family:KaiTi;
+}
+/*---------注解样式------------*/
+/*注解*/
+.note{
+font-size:0.75em;
+}
+/*y注解图片*/
+img.yiwen-footnote{
+width:0.7em;
+}
+/*---------装饰样式变化------------*/
+/*◇渐变*/
+.bg1{
+font-size:1em;
+color:#a23234;
+margin-top:20%;
+margin-bottom:5%;
+text-align:center;
+text-indent:0em;
+}
+.bg2{
+color:#b55456;
+}
+.bg3{
+color:#c37d7e;
+}
+.bg4{
+color:#d19e9f;
+}
+/*边框*/
+.fieldset{
+    border: 1px dotted black;
+    border-radius: 5px;
+font-size:0.9em;/*16px;*/
+margin-top:1em;
+margin-bottom:1em;
+padding: 1em 0.5em 1em 1em;
+}
+/*背景*/
+.beijing{
+color:#FFFFFF;
+font-size:1.2em;
+margin:1.5em 0em 1em 0em;
+background-color:#FF0033;
+border:1px solid #BDB20A;
+border-radius:0.5em 0.5em 0.5em 0.5em;
+font-weight:bold;
+padding: 1em 0.5em 1em 1em;
+}
+/*下划线*/
+.u{
+text-decoration:underline;
+}
+/*---------版权信息------------*/
+/*列表*/
+ul.list{
+font-size: 1em;
+list-style-type: none;
+text-indent: 2em;
+margin-left:1.5em;
+}
+/*列项*/
+li.i{
+margin-top:0.5em;
+font-weight:normal;
+}
+/*链接*/
+a{
+text-decoration: none;
+    color:#000000;
+}
+/*斜体 用于英文书名*/
+i{
+    font-family:Georgia, serif;
+}
+/*---------公共配置------------*/
+p{
+margin-top:0px;
+margin-bottom:0px;
+text-indent:2em;
+line-height:200%;
+    text-align: justify;
+    }
+.cover{
+    height: 700;
+    padding:50px;
+}
+
+body{
+    /*margin-top:100px;
+      margin-left:60px;
+    margin-right:60px;*/
+    font-family:Microsoft YaHei;
+    
+}
+/*what I need from here begin*/
+#mainframe{
+    float:left;
+    width:78%;
+    background-color:#FAFAFA;
+    height:calc(100% - 85px);
+    text-align:center;
+    vertical-align: middle;
+}
+#leftframe{
+    float:left;
+    width:calc(22% - 10px);
+    background-color:#f3f3f5;
+    height:calc(100% - 85px);
+    border:none;
+    border-right-color:#cccccc;
+    border-right-style:solid;
+    border-right-width:1px;
+}
+#bottomframe{
+    float:left;
+    width:100%;
+    height:85px;
+    background-color:#F5F5F5;
+    border:none;
+    border-top-color:#cccccc;
+    border-top-style:solid;
+    border-top-width:1px;
+}
+#popwin{
+    position:absolute;
+    width:600px;
+    height:600px;
+    left:calc(100% / 2 - 200px);
+    top:calc(100% / 2 - 300px);
+    overflow:hidden;
+    background-color:white;
+    border:solid 1px whitesmoke;
+    visibility:hidden;
+    text-align:center;
+}
+body{
+    overflow:hidden;
+}
+input{
+    height:30px;
+    font-size:16px;
+    text-indent: 4px;
+}
+.contxt{
+
+    font-size: 14px;
+    font-weight:normal;
+    font-family: 'Times New Roman', Times, serif;
+
+
+}
+.circle-play1{width:40px;height:40px;border-radius:50%;background:#FF9000;text-align:center;vertical-align: middle;cursor:pointer;}
+.circle-play2{width:30px;height:30px;border-radius:50%;background:#FF9000;text-align:center;}
+.player2{
+    width:25px;
+    height:25px;
+    border:0;
+    top:20px;
+    line-height:30px;
+}
+.player1{
+    width:30px;
+    height:30px;
+    border:0;
+    
+}
+.musiccontrol{
+    float:left;
+    width:300px;
+}
+.musicbar{
+    margin-top:10px;
+    overflow: hidden;
+    float:left;
+    width:calc(100% - 600px);
+}
+.musictitle{
+    overflow: hidden;
+    height:20px;
+    width:calc(100% - 80px);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+    color:#aaaaaa;
+}
+.musiccurrent{
+    overflow: hidden;
+    height:20px;
+    width:80px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+    color:#aaaaaa;
+}
+.musicprocess{
+    overflow:hidden;
+    height:40px;
+    width:100%;
+    background-color: whitesmoke;
+}
+.biglogo{
+    margin-top:80px;
+}
+.searchbox{
+    height:35px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    border-color: #aaaaaa;
+    
+}
