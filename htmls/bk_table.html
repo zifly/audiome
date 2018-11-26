@@ -1,0 +1,49 @@
+<div id="book[bookID]">
+<table cellspacing=0 cellpadding=5 border=0>
+  <tr>
+    <td width="200" height="200" align="center" valign="top">
+        <img src="[bookCover]" border=0 width=180 height=180 class="coverimg" />
+    </td>
+    <td width=500 valign=top>
+        <table cellpadding=0 cellspacing=0 border=0 width=500>
+            <tr><td class="AudioTitle" id="bookName"><a class="AudioTitle" href="./audiodetail.php?ID=[bookIDEnc]" target="_blank">[bookName]</a></td></tr>
+            <tr><td class="AudioSubTitle" id="bookSubTitle">[bookSubTitle]</td></tr>
+            <tr><td height=10> </td></tr>
+            <tr><td class="AudioContent" id="bookWriter">By: [bookWriter]</td></tr>
+            <tr><td class="AudioContent" id="bookReader">Narrated by: [bookReader]</td></tr>
+            <tr><td class="AudioContent" id="bookLength">Length: [bookLength]&nbsp;&nbsp;<!--（<span id="bookUnabridged">[bookUnbridged]</span>）--></td></tr>
+            <tr><td class="AudioContent" id="bookLanguage">Language: [bookLanguage]</td></tr>
+            
+            <tr><td class="AudioContent" id="bookDate">Release Date: [bookDate]</td></tr>
+            <tr><td class="AudioContent" id="bookLabels">Tags: [bookLabels]</td></tr>
+        </table>
+    </td>
+  
+     <td width=180 valign=top>
+        <table cellpading=0 cellspacing=0 border=0>
+            <tr>
+                <td colspan="3"><input type=button class="flatButton" onclick="javascript:doEdit([bookSort])" value="EDIT INFO" /></td>
+            </tr>
+            <tr><td height=15 align="center" >&nbsp;</td></tr>
+            <tr>
+                <td colspan="3"><input type=button class="flatButton" onclick="javascript:doOtherInfo([bookSort])" value="Other Info" /></td>
+            </tr>
+            <tr>
+                <td width=55> <hr /></td>
+                <td class="AudioContent" align=center>OR</td>
+                <td width=55> <hr /></td>
+            </tr>
+            <tr>
+                <td colspan="3"><input name="playListButton" type=button class="flatButton2" onclick="javascript:doPlaylist([bookSort])" value="Create Play List" /></td>
+            </tr>
+            <tr><td height=15 align="center" >&nbsp;</td></tr>
+            <tr>
+                <td colspan="3"><input type=button class="flatButton2" onclick="javascript:doMagnet([bookSort])" value="Magnet Link" /></td>
+            </tr>
+        </table>
+     </td>
+  </tr>
+  <tr><td colspan="3"><hr /></td></tr>
+</table>
+</div>
+

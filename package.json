@@ -6,11 +6,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron ."
-
   },
   "author": "Yu Yi",
   "license": "ISC",
   "devDependencies": {
     "electron": "^3.0.2"
+  },
+  "dependencies": {
+    "buffer": "^5.2.1",
+    "jsmediatags": "^3.8.1",
+    "react-native-fs": "^2.12.0",
+    "sqlite3": "^4.0.2"
   }
 }

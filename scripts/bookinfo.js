@@ -6,7 +6,6 @@ root1=process.cwd()
 
 storename='bookstore';
 bookroot=root1+"\\"+storename;
-console.log(bookroot);
 
 if(!exists(bookroot)){
     createfolder(root1,storename);
@@ -19,25 +18,22 @@ if(!exists(bookidx)){
 
 myargs=process.argv.splice(2);
 
-mystyle=parseInt(myargs[0]);// save json 的状态,1 =new 如有文件存在就报错 0=modify 文件存在则覆盖
+mystyle=parseInt(myargs[0]);// save json 的状态,1 =new 如有文件存在就报错; 0=modify 文件存在则覆盖
 
 mystr=myargs[1];
 myarg=mystr.split('**');
 bookname=myarg[0];
 bookfolder=myarg[1];
-console.log('mystyle=='+mystyle);
 
 if(bookfolder==''){
     bookfolder=formatfoldername(bookname);
     createfolder(bookroot,bookfolder);
 }
 bookfolderpath=bookroot+"\\"+bookfolder+"\\";
-console.log(bookfolderpath);
 myarg[1]=bookfolder;
 
 idxfile=bookidx+'\\book_'+bookfolder+'.json';
-console.log(idxfile)
-
+console.log('bookinfo='+idxfile);
 if(exists(idxfile) && mystyle==1){
     str1="ERROR 9999: Exists this book: book name = " +bookname;
     console.log(str1);
@@ -45,19 +41,11 @@ if(exists(idxfile) && mystyle==1){
 }
 else{
     bookjsonstr=getbookjson(myarg);
-       console.log(bookjsonstr);
-
     fs.writeFile(idxfile,bookjsonstr,function(err){
          if(err){ throw err }
         }
     );
 }
-
-
-
-
-
-
 
 
     function createfolder(p,s){
@@ -98,6 +86,7 @@ else{
             'reader',
             'length',
             'releasedate',
+            'cover',
             'language',
             'publisher'
         );

@@ -324,12 +324,15 @@ line-height:200%;
     height: 700;
     padding:50px;
 }
+/*===========================================*/
+
 
 body{
     /*margin-top:100px;
       margin-left:60px;
     margin-right:60px;*/
     font-family:Microsoft YaHei;
+    overflow:hidden;
     
 }
 /*what I need from here begin*/
@@ -340,6 +343,7 @@ body{
     height:calc(100% - 85px);
     text-align:center;
     vertical-align: middle;
+    overflow:hidden;
 }
 #leftframe{
     float:left;
@@ -361,21 +365,45 @@ body{
     border-top-style:solid;
     border-top-width:1px;
 }
+#maindo2{
+    float:left;
+    height:100%;
+    width:100%;
+    overflow:hidden;
+    
+}
+#replyinfo{
+    position:absolute;
+    height:calc(100% - 110px);
+    width:300;
+    left:calc(100% - 320px);
+    top:1;
+    border:none;
+    border-top:solid 1px #aaaaaa;
+    overflow:scroll;
+    font-size:14px;
+    color:#111111;
+    text-align:left;
+    padding: 5px 0.25em 2ex 2em;
+    border:solid 1px whitesmoke;
+    
+    z-index:-1;
+    background:#eeeeee;
+}
 #popwin{
     position:absolute;
-    width:600px;
-    height:600px;
-    left:calc(100% / 2 - 200px);
-    top:calc(100% / 2 - 300px);
+    width:400px;
+    height:200px;
+    left:calc(100% / 2 - 150px);
+    top:calc(100% / 2 - 150px);
     overflow:hidden;
     background-color:white;
-    border:solid 1px whitesmoke;
+    border:solid 2px whitesmoke;
     visibility:hidden;
     text-align:center;
+    font-size:12px;
 }
-body{
-    overflow:hidden;
-}
+
 input{
     height:30px;
     font-size:16px;
@@ -385,18 +413,17 @@ input{
 
     font-size: 14px;
     font-weight:normal;
-    font-family: 'Times New Roman', Times, serif;
+    font-family: Microsoft YaHei,'Times New Roman', Times, serif;
 
 
 }
 .circle-play1{width:40px;height:40px;border-radius:50%;background:#FF9000;text-align:center;vertical-align: middle;cursor:pointer;}
 .circle-play2{width:30px;height:30px;border-radius:50%;background:#FF9000;text-align:center;}
 .player2{
-    width:25px;
-    height:25px;
+    width:30px;
+    height:30px;
     border:0;
-    top:20px;
-    line-height:30px;
+    line-height:40px;
 }
 .player1{
     width:30px;
@@ -418,7 +445,7 @@ input{
     overflow: hidden;
     height:20px;
     width:calc(100% - 80px);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Microsoft YaHei, Arial, Helvetica, sans-serif;
     font-size: 9pt;
     color:#aaaaaa;
 }
@@ -443,5 +470,63 @@ input{
     height:35px;
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     border-color: #aaaaaa;
+    
+}
+
+.songlistdetail_0{
+    width:100%;
+    height:40;
+    font-size:12px;
+    text-align:left;
+    font-family: Microsoft YaHei,Arial, Helvetica, sans-serif;
+    color:#333333;
+    overflow:hidden;
+        text-overflow:ellipsis;
+        word-wrap: break-word;
+    background:#ffffff;
+}
+.songlistdetail_1{
+    width:100%;
+    height:40;
+    font-size:12px;
+    text-align:left;
+    font-family: Microsoft YaHei,Arial, Helvetica, sans-serif;
+    color:#333333;
+    overflow:hidden;
+        text-overflow:ellipsis;
+        word-wrap: break-word;
+    background:#eeeeee;
+}
+
+.songlistdetail_0:hover{
+    
+    color:#555555;
+    background:#cccccc;
+}
+
+
+.songlistdetail_1:hover{
+    color:whitesmoke;
+    background:#333333;
+}
+
+
+.titlelink{
+    cursor:pointer;
+    text-decoration:none;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    word-break:hyphenate;
+    }
+.titlelink:hover{
+    cursor:pointer;
+    text-decoration:underline;
+}
+.playlistcover{
+    width:120;
+    height:120;
+    text-align:center;
+    float:left;
+
     
 }
