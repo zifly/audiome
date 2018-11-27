@@ -45,8 +45,7 @@ ipc.on('ac3-flac',function(event) {
   },function(myfiles){
      if(myfiles){
        myfile=myfiles[0];
-       console.log("myfile="+myfile);
-       //event.sender.send("reply-info","myfile="+myfile)
+       
        cmdstr="c:\\myTools\\MediaTools\\eac3to334\\eac3to.exe";
        flacfile=myfile.substr(0,myfile.length-3)+"flac";
        console.log("flac="+flacfile);
@@ -223,27 +222,18 @@ ipc.on('push-audio-id',function(event,audioid){
 
 ipc.on('play-one-audio',function(event,args){
   audioid=args['id'];
-  myfolderid=args['al']['id'];
-  myfolder=args['al']['name'];
-  myfoldernew=myfolderid+"_"+myfolder;
+  checkonelocalsong(args);
+  
+    listfolder=getfullfolder(args);
 
-    listfolder=myfolders.folders['music']+formatfoldername(myfolder);
-    listfoldernew=myfolders.folders['music']+formatfoldername(myfoldernew);
-    if(fs.existsSync(listfolder)) {
-      fs.renameSync(listfolder,listfoldernew);
-      event.sender.send('reply-info',"change foldername:"+listfoldernew)
-    }
-    listfolder=listfoldernew;
-
-    mp3filename=getsongfile(args);
-    mp3file=listfolder+"\\"+mp3filename;
-    
+    mp3file=getfullmp3file(args);
+    event.sender.send('reply-info',"localfile:"+mp3file)
     if(fs.existsSync(mp3file)){
       mp3url=mp3file;
-
+      
       coverurl=listfolder+"\\cover.jpg";
       
-      event.sender.send("reply-info","we found the file:"+mp3file)
+      //event.sender.send("reply-info","we found the file:"+mp3file)
       event.sender.send('mp3url',mp3url);  
       fs.exists(coverurl,function(ex){
         if(ex) event.sender.send("return-audio-cover",coverurl); 
@@ -262,7 +252,7 @@ ipc.on('play-one-audio',function(event,args){
               mp3url=objs['data'][0]['url'];
               
               event.sender.send('mp3url',mp3url);
-              event.sender.send('reply-info',objs);
+              //event.sender.send('reply-info',objs);
 
               coverurl=args['al']['picUrl'];
               event.sender.send("return-audio-cover",coverurl); 
@@ -276,7 +266,7 @@ ipc.on('play-one-audio',function(event,args){
               mp3url=objs['data'][0]['url'];
               
               event.sender.send('mp3url',mp3url);
-              event.sender.send('reply-info',objs);
+              //event.sender.send('reply-info',objs);
 
               coverurl=args['al']['picUrl'];
               event.sender.send("return-audio-cover",coverurl); 
@@ -306,42 +296,32 @@ ipc.on('down-list-cover',function(event,coverstr,listid){
 
 
 ipc.on('audio-down',function(event,args){
-  audioid=args['id'];
-  myfolderid=args['al']['id'];
-  myfolder=args['al']['name'];
-  myfoldernew=myfolderid+"_"+myfolder;
-
-    listfolder=myfolders.folders['music']+formatfoldername(myfolder);
-    listfoldernew=myfolders.folders['music']+formatfoldername(myfoldernew);
-    if(fs.existsSync(listfolder)) {
-      fs.renameSync(listfolder,listfoldernew);
-    }
-    listfolder=listfoldernew;
+    myargs=checkonelocalsong(args);  
+    listfolder=getfullfolder(args);
 
     if(!fs.existsSync(listfolder)){
       fs.mkdirSync(listfolder);
     }
     
+    mp3file=getfullmp3file(args);
+
     coverurl=args['al']['picUrl']
     dopic(listfolder,coverurl);
     
-    //console.log(songfile)
-    mp3filename=getsongfile(args)    
-    mp3file=listfolder+"\/"+mp3filename;
-    if(fs.existsSync(mp3file)){
-      event.sender.send("reply-info","File Exists:"+mp3filename);
+    if(myargs['localFile']!=''){
+      event.sender.send("reply-info","File Exists:"+mp3file);
       event.sender.send("audio-down-finish");
     }
     else{
       //===============================
+     
       songfile= myfolders.folders['cache']+'data\\'+audioid+'.json'
       if(fs.existsSync(songfile)){
-        event.sender.send('reply-info',"have data:"+songfile);
+        //event.sender.send('reply-info',"have data:"+songfile);
         obj=fs.readFileSync(songfile);
         dodown(obj,event,mp3file);
       }
       else{
-
         var options=myserver.search('/song/url?id=' + audioid)
       
       HttpRequest(options,function(obj){
@@ -381,10 +361,18 @@ ipc.on('get-play-list',function(event,playlistid){
   jsfile=myfolders.folders['cache']+"playlists\\"+playlistid+'.json';
   //console.log("newjsfile:"+jsfile)
   if(fs.existsSync(jsfile)){
-    event.sender.send("reply-info","find jsfile:"+jsfile);
+    //event.sender.send("reply-info","find jsfile:"+jsfile);
     mystr=getfilefromlocal(jsfile);
     objs=JSON.parse(mystr);
+    
     playlist=objs['playlist'];
+    tracks=playlist['tracks'];
+    for(i=0;i<tracks.length;i++){
+      arg1=tracks[i];
+      tracks[i]=checkonelocalsong(arg1);
+      //console.log('get'+tracks[i]['localFile']);
+    }
+    objs['playlist']['tracks']=tracks;
     event.sender.send('playlist-info',objs);
     coverurl=playlist['coverImgUrl'];
     coverfile=myfolders.folders['playlist']+"cover-"+playlistid+".jpg";
@@ -405,6 +393,14 @@ ipc.on('get-play-list',function(event,playlistid){
   
         });
        objs=JSON.parse(obj);
+       playlist=objs['playlist'];
+       tracks=playlist['tracks'];
+       for(i=0;i<tracks.length;i++){
+         arg1=tracks[i];
+         tracks[i]=checkonelocalsong(tracks[i]);
+         
+       }
+       objs['playlist']['tracks']=tracks;
        code=objs['code'];
        if(code==200){
             event.sender.send('playlist-info',objs);
@@ -429,6 +425,11 @@ ipc.on('get-album-list',function(event,albumlistid){
     event.sender.send("reply-info","find jsfile:"+jsfile);
     mystr=getfilefromlocal(jsfile);
     objs=JSON.parse(mystr);
+    songs=objs['songs'];
+     for(i=0;i<songs.length;i++){
+      songs[i]=checkonelocalsong(songs[i]);
+     }
+     objs['songs']=songs;
     event.sender.send('albumlist-info',objs);
   }
   else{
@@ -443,6 +444,11 @@ ipc.on('get-album-list',function(event,albumlistid){
         }
       });
      objs=JSON.parse(obj);
+     songs=objs['songs'];
+     for(i=0;i<songs.length;i++){
+      songs[i]=checkonelocalsong(songs[i]);
+     }
+     objs['songs']=songs;
      code=objs['code'];
      if(code==200){
       event.sender.send('albumlist-info',objs);
@@ -453,19 +459,24 @@ ipc.on('get-album-list',function(event,albumlistid){
 }
 })
 
-ipc.on('get-new-lists',function(event){
-  pfolder=myfolders.folders['cache']+"playlists";
-  console.log('path='+pfolder)
-
-  var options=myserver.search("/top/playlist/highquality")
+ipc.on('get-new-lists',function(event,lasttime){
+  console.log('lasttime='+lasttime)
+  if(lasttime==''){
+    var options=myserver.search("/top/playlist/highquality")
+  }
+  else{
+    var options=myserver.search("/top/playlist/highquality?before="+lasttime)
+  }
  
   HttpRequest(options,function(obj){
     if(obj){
      objs=JSON.parse(obj);
+     //console.log(objs);
      code=objs['code'];
      if(code==200){
       newlists=objs['playlists'];
-      event.sender.send('return-new-lists',newlists);
+      console.log(newlists[0]['name'])
+      event.sender.send('return-new-lists',objs);
      }
     
   }
@@ -550,6 +561,7 @@ function getsongfile(args){
     }
     songfile1=formatfilename(songfile1);
     thisfile=songfile1+".mp3";
+    //console.log('thisfile='+thisfile)
     return thisfile;
 }
 
@@ -616,6 +628,9 @@ imgs=mytags['picture'];
 }
 
 function formatfoldername(s){
+  if(s!=null){
+
+  
   s=s.replace(/\:/ig,"-");
   s=s.replace(/\*/ig,"_")
   s=s.replace(/\\/ig,"-")
@@ -624,7 +639,7 @@ function formatfoldername(s){
   s=s.replace(/\"/ig,"-")
   s=s.replace(/\?/ig,"")
   s=s.replace(/\./ig,"-")
-  
+}
   return s;
 
 }
@@ -697,6 +712,7 @@ function dopic(picpath,surl){
 }
 
 function dodown(obj,e,mp3file){
+  console.log("down mp3="+mp3file)
   objs=JSON.parse(obj);
          if(objs['code']==200){
             
@@ -741,10 +757,65 @@ function getnowtime(){
   if(hour<10) hour='0'+hour;
   if(minute<10) minute='0'+minute;
   if(second<10) second='0'+second;
-  if(monthr<10) month='0'+month;
+  if(month<10) month='0'+month;
   if(nowdate<10) nowdate='0'+nowdater;
 
-  datestr=year+'-'+month+'-'+'nowdate'+' '+hour+':'+'minute'+':'+second;
+  datestr=year+'-'+month+'-'+nowdate+' '+hour+':'+minute+':'+second;
   return datestr;
 
+}
+//-----------------------------
+//检查是否有本地音乐文件，添加[localUrl]
+//有，localUrl=mp3file
+//无，localUrl='';
+function checkonelocalsong(arg){
+  audioid=arg['id'];
+  
+  myfolderid=arg['al']['id'];
+  myfolder=arg['al']['name'];
+  myfoldernew=myfolderid+"_"+myfolder;
+
+    listfolder=myfolders.folders['music']+formatfoldername(myfolder);
+    listfoldernew=myfolders.folders['music']+formatfoldername(myfoldernew);
+    //console.log(listfoldernew)
+    if(fs.existsSync(listfolder) && !fs.existsSync(listfoldernew)) {
+      fs.renameSync(listfolder,listfoldernew);
+    }
+    if(fs.existsSync(listfolder) && fs.existsSync(listfoldernew)) {
+      console.log('两个文件夹同时存在！')
+      console.log('1.'+listfolder)
+      console.log('2.'+listfoldernew);
+    }
+    listfolder=listfoldernew;
+      
+   myfile=getfullmp3file(arg)
+
+    if(fs.existsSync(myfile)){
+      arg['localFile']=myfile;
+    }
+    else{
+      arg['localFile']='';
+    }
+  
+  return arg;
+
+}
+
+function getfullfolder(args){
+  myfolderid=args['al']['id'];
+  myfolder=args['al']['name'];
+  myfolder=myfolderid+"_"+myfolder;
+  
+  listfolder=myfolders.folders['music']+formatfoldername(myfolder);
+  return listfolder
+}
+
+function getfullmp3file(args){
+
+  listfolder=getfullfolder(args);
+
+  
+  mp3filename=getsongfile(args)  
+  mp3file=listfolder+"\\"+mp3filename;
+  return mp3file
 }

@@ -537,3 +537,59 @@ input{
 
     
 }
+
+/*-------------------在歌曲列表中使用----------------------*/
+.listtitle{
+        
+    text-align:center;
+    font-family: Microsoft YaHei,Arial, Helvetica, sans-serif;
+    font-size:16pt;
+    font-weight:normal;
+    
+
+    }
+    .listcontxt{
+        height:20px;
+        font-family: Microsoft YaHei,Arial, Helvetica, sans-serif;
+        font-size: 9pt;
+        color:#aaaaaa;
+    }
+    .detailtitle{
+    
+    text-align:center;
+    font-family: Microsoft YaHei,Arial, Helvetica, sans-serif;
+    font-size:12pt;
+    font-weight:normal;
+    
+
+    }
+.headerdesc{
+        width:calc(100% - 300px);
+    }
+.playlisttitlearea{
+    width:95%;
+}
+.titlerightarea{
+    width:calc(100% - 250);
+    height:120;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    word-wrap: break-word;
+    word-break: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+
+}
+.listmain1{
+width:100%;
+height:calc(100% - 260px);
+overflow-y:scroll;
+overflow-x:none;
+z-index:-1;
+}
+.songartist{
+overflow: hidden;
+text-overflow:ellipsis;
+word-break:hyphenate;
+}
