@@ -1,7 +1,7 @@
 {
   "name": "audiome",
   "version": "0.0.1",
-  "description": "audiobook player",
+  "description": "netease Music player",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,12 +10,26 @@
   "author": "Yu Yi",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^3.0.2"
+    "electron": "^3.0.10",
+    "peer": "^0.2.10",
+    "prop-types": "^15.6.2",
+    "react-native": "^0.57.5"
   },
   "dependencies": {
     "buffer": "^5.2.1",
     "jsmediatags": "^3.8.1",
     "react-native-fs": "^2.12.0",
     "sqlite3": "^4.0.2"
-  }
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zifly/audiome.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zifly/audiome/issues"
+  },
+  "homepage": "https://github.com/zifly/audiome#readme"
 }

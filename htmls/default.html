@@ -74,8 +74,11 @@
                 <tr style="cursor:pointer" onclick="javascript:clearplaysongslist()">
                     <td width=15% align=center height=30><img src="./images/audio-book.png" border=0 width=20 height=20></td>
                     <td width=85% align=left class=contxt>清空播放列表</td>
-            </tr>
-
+                </tr>
+                <tr style="cursor:pointer" onclick="javascript:backtolist()">
+                        <td width=15% align=center height=30><img src="./images/audio-book.png" border=0 width=20 height=20></td>
+                        <td width=85% align=left class=contxt>返回首页</td>
+                    </tr>
                 <tr><td height=80></td></tr>
                 <tr>
                     <td colspan=2 align=right class=note>
@@ -90,8 +93,10 @@
 
     </div>
     <div id=mainframe>
-        <div id=maindo2>
-        </div>
+        
+        <div id=maindo2></div>
+        <div id=maindo1></div>
+        
     </div>
     
     
@@ -107,7 +112,7 @@
                         <table cellpadding=0 cellspacing=10 border=0 width=200>
                             <tr>
                                 <td valign=center align=center><div class=circle-play2  style="cursor:pointer" ><img src="./images/left-1.png" class=player2 onclick="javascript:prev()"></div></td>
-                                <td valign=center align=center class=circle-play1><img src="./images/play_1.png" id=player_play class=player1  onclick="javascript:goto()"></td>
+                                <td valign=center align=center class=circle-play1><img src="./images/play_1.png" id=player_play class=player1  onclick="javascript:playthis()"></td>
                                 <td valign=center align=center><div class=circle-play2 style="cursor:pointer"><img src="./images/right-1.png" class=player2  onclick="javascript:next()"></div></td>
                             </tr>
                         </table>
@@ -148,7 +153,10 @@
 </body>
 </html>
 <script>
-
+window.onload=function(){
+    
+    ipc.send('get-new-lists')
+}
 
 </script>
 <script src="../lib/default-render.js"></script>

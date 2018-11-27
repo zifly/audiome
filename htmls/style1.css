@@ -370,7 +370,14 @@ body{
     height:100%;
     width:100%;
     overflow:hidden;
-    
+    text-align:center;
+}
+#maindo1{
+    float:left;
+    height:100%;
+    width:100%;
+    overflow-y:scroll;
+    visibility:hidden;
 }
 #replyinfo{
     position:absolute;
@@ -523,8 +530,8 @@ input{
     text-decoration:underline;
 }
 .playlistcover{
-    width:120;
-    height:120;
+    width:220;
+    height:220;
     text-align:center;
     float:left;
 

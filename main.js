@@ -1,5 +1,9 @@
+﻿const electron = require('electron')
 
-const electron = require('electron')
+const remote = electron.remote;
+//const Menu = remote.Menu;
+//const MenuItem = remote.MenuItem;
+
 const { app, BrowserWindow } = require('electron')
 const ipc = require('electron').ipcMain;
 const fs=require('fs');
@@ -10,71 +14,24 @@ const http=require("http");
 const request = require('request');
 const myfolders=require('./lib/myfolders.js');
 const myserver=require('./lib/myserver.js')
+var win;
 
 
   function createWindow () {  
-    electron.Menu.setApplicationMenu(null)    //hide electron Menu
-
-    win = new BrowserWindow({ width: 1200, height:760 })
-    
-    win.openDevTools();
-
+    electron.Menu.setApplicationMenu(null) 
+    let win = new BrowserWindow(
+      { 
+      width: 1200, 
+      height:760,
+      title:"Netease Music DownLoader" 
+      })
+      //win.openDevTools();
       win.loadURL(__dirname + '/htmls/default.html')
-      //console.log('defaultfolder='+myfolders.folders['music'])
-      //win.loadURL("http://audiobookou.com");
+     
   }
   
   app.on('ready', createWindow);
-
-  //listening the channel create a new book and write info to json
-
-  ipc.on('new-bookinfo',function(event,arg) {
-   
-    runpath=process.cwd()+"\\scripts\\bookinfo.js";
-    argstr=arg.join("**");
-    var sendstr="OK!";
-    var idxstr="";
-    //-----------------------------------------------------------------------
-    // spawn args:
-    //  1 'node' commander
-    //  2,[] args
-    //  2.1 runpath excute js file
-    //  2.2  number 1= add new book
-    //       number 0= modify book info
-    //  2.3  argstr js file's received args string,not array
-    //----------------------------------------------------------------------
-
-    const ls = spawn('node', [runpath,1,argstr]);
-      ls.stdout.on('data', (data) => {
-        console.log(`${data}`);
-        datastr=data.toString();
-        if(datastr.indexOf('ERROR 9999:')>-1){
-          sendstrs=datastr.split('9999:');
-          sendstr=sendstrs[1]
-        }
-        if(datastr.indexOf('bookinfo=')>-1){
-          infoarr=datastr.split('bookinfo=');
-          idxstr=infoarr[1];
-          if(idxstr.indexOf('\n')>0){
-            idxstrs=idxstr.split('\n');
-            idxstr=idxstrs[0];
-          }
-        }
-      });
-
-      ls.stderr.on('data', (data) => {
-         sendstr=data.toString();
-      });
-
-      ls.on('close', (code) => {
-        sendstr=sendstr+"\n"+idxstr;
-           event.sender.send('save-bookinfo-reply',sendstr);
-      });
-      
   
-});
-
-
 
 ipc.on('ac3-flac',function(event) {
   dialog.showOpenDialog({
@@ -236,19 +193,29 @@ ipc.on('change-uc-folder',function(event,ofolder) {
 
 ipc.on('push-audio-id',function(event,audioid){
   console.log(audioid)
-  var options=myserver.path('/song/url?id=' + audioid)
+  var options=myserver.search('/song/url?id=' + audioid)
     
   HttpRequest(options,function(obj){
+    
     if(obj){
+      
      objs=JSON.parse(obj);
-     mp3url=objs['data'][0]['url'];
-     //id=objs['data'][0]['id'];
-     //mp3file=".\/download\/"+id+".mp3"
-     //request(mp3url).pipe(fs.createWriteStream(mp3file))
-     event.sender.send('mp3url',mp3url);
-     //console.log(obj);
-
      event.sender.send('reply-info',objs);
+
+     if(objs['code']==200){
+      mp3url=objs['data'][0]['url'];
+      if(mp3url!=null){
+        id=objs['data'][0]['id'];
+        mp3file=".\/tempmusic\/"+id+".mp3"
+        request(mp3url).pipe(fs.createWriteStream(mp3file))
+        event.sender.send('mp3url',mp3url);
+      }
+      else event.sender.send('reply-info','没有权限播放')
+      //console.log(obj);
+ 
+      
+     }
+     
   }
   });
 
@@ -256,13 +223,21 @@ ipc.on('push-audio-id',function(event,audioid){
 
 ipc.on('play-one-audio',function(event,args){
   audioid=args['id'];
+  myfolderid=args['al']['id'];
   myfolder=args['al']['name'];
-  
-    listfolder=myfolders.folders['music']+formatfoldername(myfolder);
-    mp3filename=getsongfile(args);
+  myfoldernew=myfolderid+"_"+myfolder;
 
+    listfolder=myfolders.folders['music']+formatfoldername(myfolder);
+    listfoldernew=myfolders.folders['music']+formatfoldername(myfoldernew);
+    if(fs.existsSync(listfolder)) {
+      fs.renameSync(listfolder,listfoldernew);
+      event.sender.send('reply-info',"change foldername:"+listfoldernew)
+    }
+    listfolder=listfoldernew;
+
+    mp3filename=getsongfile(args);
     mp3file=listfolder+"\\"+mp3filename;
-    console.log('play this music:'+mp3file);
+    
     if(fs.existsSync(mp3file)){
       mp3url=mp3file;
 
@@ -293,7 +268,7 @@ ipc.on('play-one-audio',function(event,args){
               event.sender.send("return-audio-cover",coverurl); 
       }
       else{
-        var options=myserver.path('/song/url?id=' + audioid)
+        var options=myserver.search('/song/url?id=' + audioid)
         
         HttpRequest(options,function(obj){
           if(obj){
@@ -331,9 +306,18 @@ ipc.on('down-list-cover',function(event,coverstr,listid){
 
 
 ipc.on('audio-down',function(event,args){
-    myfolder=args['al']['name'];
-    audioid=args['id'];
+  audioid=args['id'];
+  myfolderid=args['al']['id'];
+  myfolder=args['al']['name'];
+  myfoldernew=myfolderid+"_"+myfolder;
+
     listfolder=myfolders.folders['music']+formatfoldername(myfolder);
+    listfoldernew=myfolders.folders['music']+formatfoldername(myfoldernew);
+    if(fs.existsSync(listfolder)) {
+      fs.renameSync(listfolder,listfoldernew);
+    }
+    listfolder=listfoldernew;
+
     if(!fs.existsSync(listfolder)){
       fs.mkdirSync(listfolder);
     }
@@ -342,7 +326,7 @@ ipc.on('audio-down',function(event,args){
     dopic(listfolder,coverurl);
     
     //console.log(songfile)
-    mp3filename=getsongfile(args)
+    mp3filename=getsongfile(args)    
     mp3file=listfolder+"\/"+mp3filename;
     if(fs.existsSync(mp3file)){
       event.sender.send("reply-info","File Exists:"+mp3filename);
@@ -358,7 +342,7 @@ ipc.on('audio-down',function(event,args){
       }
       else{
 
-        var options=myserver.path('/song/url?id=' + audioid)
+        var options=myserver.search('/song/url?id=' + audioid)
       
       HttpRequest(options,function(obj){
         if(obj){
@@ -381,7 +365,7 @@ ipc.on('audio-down',function(event,args){
 
 
 ipc.on('netease-login',function(event){
-  var options=myserver.path('/login?email=zifly77@163.com&password=lelecx0124')
+  var options=myserver.search('/login?email=zifly77@163.com&password=lelecx0124')
   
   HttpRequest(options,function(obj){
     if(obj){
@@ -413,7 +397,7 @@ ipc.on('get-play-list',function(event,playlistid){
   }
   else{
     //-----------------------------------------
-    var options=myserver.path('/playlist/detail?id=' + playlistid)
+    var options=myserver.search('/playlist/detail?id=' + playlistid)
     
     HttpRequest(options,function(obj){
       if(obj){
@@ -449,7 +433,7 @@ ipc.on('get-album-list',function(event,albumlistid){
   }
   else{
 
-    var options=myserver.path('/album?id=' + albumlistid)
+  var options=myserver.search('/album?id=' + albumlistid)
 
   HttpRequest(options,function(obj){
     if(obj){
@@ -469,6 +453,24 @@ ipc.on('get-album-list',function(event,albumlistid){
 }
 })
 
+ipc.on('get-new-lists',function(event){
+  pfolder=myfolders.folders['cache']+"playlists";
+  console.log('path='+pfolder)
+
+  var options=myserver.search("/top/playlist/highquality")
+ 
+  HttpRequest(options,function(obj){
+    if(obj){
+     objs=JSON.parse(obj);
+     code=objs['code'];
+     if(code==200){
+      newlists=objs['playlists'];
+      event.sender.send('return-new-lists',newlists);
+     }
+    
+  }
+  });
+})
 
 
 //=======================================================
@@ -708,12 +710,11 @@ function dodown(obj,e,mp3file){
             }
             else{
               
-              var myDate = new Date();
-                  myDate.toLocaleString(); 
+                  mydate=getnowtime();
                   errorstr="Error:没有权限下载------>"+mp3file
                   console.log(errorstr);
-              fs.appendFile("./errorinfo.log",errorstr+"\r\n"+myDate+"\r\n--------------------------------------------------------------\r\n" , (error)  => {
-                if (error) return console.log("追加文件失败" + error.message);
+              fs.appendFile("./errorinfo.log",errorstr+"\r\n"+mydate+"\r\n--------------------------------------------------------------\r\n" , (error)  => {
+                if (error) return console.log("追加信息失败" + error.message);
                 
                 });
                
@@ -727,4 +728,23 @@ function dodown(obj,e,mp3file){
           e.sender.send('reply-info',errorstr);
           e.sender.send("audio-down-finish");
          }
+}
+
+function getnowtime(){
+  var myDate = new Date();
+  year=myDate.getFullYear;
+  month=myDate.getMonth+1;
+  nowdate=myDate.getDate;
+  hour=myDate.getHours;
+  minute=myDate.getMinutes;
+  second=myDate.getSeconds;
+  if(hour<10) hour='0'+hour;
+  if(minute<10) minute='0'+minute;
+  if(second<10) second='0'+second;
+  if(monthr<10) month='0'+month;
+  if(nowdate<10) nowdate='0'+nowdater;
+
+  datestr=year+'-'+month+'-'+'nowdate'+' '+hour+':'+'minute'+':'+second;
+  return datestr;
+
 }
