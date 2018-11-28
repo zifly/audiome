@@ -330,19 +330,6 @@ ipc.on('audio-down',function(event,args){
 })
 
 
-ipc.on('netease-login',function(event){
-  var options=myserver.search('/login?email=zifly77@163.com&password=lelecx0124')
-  
-  HttpRequest(options,function(obj){
-    if(obj){
-     objs=JSON.parse(obj);
-    
-    // event.sender.send('reply-info',objs);
-  }
-  });
-
-})
-
 ipc.on('get-play-list',function(event,playlistid){
   jsfile=myfolders.folders['cache']+"playlists\\"+playlistid+'.json';
   //console.log("newjsfile:"+jsfile)

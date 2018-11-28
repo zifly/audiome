@@ -5,3 +5,5 @@
 /tempmusic/*
 /download/*
 /downloads/*
+/errorinfo.log
+/start.bat
