@@ -24,7 +24,7 @@ const tagWriter = require('browser-id3-writer');
       height:760,
       title:"Netease Music DownLoader" 
       })
-      win.openDevTools();
+      //win.openDevTools();
       win.loadURL(__dirname + '/htmls/default.html')
      
   }
@@ -107,7 +107,7 @@ ipc.on('open-audio-file',function(event) {
       
       new jsmediatags.read(myfile, {
         onSuccess: function(tags) {
-        //console.log(tags);
+        console.log(tags);
         mytags=tags['tags'];
        mycover=getcoverfromtags(tags);
        event.sender.send("return-audio-cover",mycover);    
@@ -359,20 +359,24 @@ ipc.on('get-play-list',function(event,playlistid){
     
     HttpRequest(options,function(obj){
       if(obj){
-        fs.writeFile(jsfile,obj,function(err){
+        objs=JSON.parse(obj);
+        code=objs['code'];
+        if(code==200){
+          fs.writeFile(jsfile,obj,function(err){
   
-        });
-       objs=JSON.parse(obj);
-       playlist=objs['playlist'];
-       tracks=playlist['tracks'];
-       for(i=0;i<tracks.length;i++){
-         arg1=tracks[i];
-         tracks[i]=checkonelocalsong(tracks[i]);
+          });
+        }
+       
+      if(code==200){ 
+        playlist=objs['playlist'];
+        tracks=playlist['tracks'];
+        for(i=0;i<tracks.length;i++){
+          arg1=tracks[i];
+          tracks[i]=checkonelocalsong(tracks[i]);
          
-       }
+        }
        objs['playlist']['tracks']=tracks;
-       code=objs['code'];
-       if(code==200){
+       
             event.sender.send('playlist-info',objs);
             coverurl=objs['playlist']['coverImgUrl'];
             coverfile=myfolders.folders['playlist']+"cover-"+playlistid+".jpg";
@@ -392,9 +396,10 @@ ipc.on('get-album-list',function(event,albumlistid){
   
   jsfile=myfolders.folders['cache']+"albums\\"+albumlistid+'.json';
   if(fs.existsSync(jsfile)){
-    event.sender.send("reply-info","find jsfile:"+jsfile);
+    //event.sender.send("reply-info","find jsfile:"+jsfile);
     mystr=getfilefromlocal(jsfile);
     objs=JSON.parse(mystr);
+    
     songs=objs['songs'];
      for(i=0;i<songs.length;i++){
       songs[i]=checkonelocalsong(songs[i]);
@@ -408,20 +413,25 @@ ipc.on('get-album-list',function(event,albumlistid){
 
   HttpRequest(options,function(obj){
     if(obj){
+      objs=JSON.parse(obj);
+      code=objs['code'];
+     if(code==200){
       fs.writeFile(jsfile,obj,function(err){
         if(err){
           console.log(err.message)
         }
       });
-     objs=JSON.parse(obj);
-     songs=objs['songs'];
-     for(i=0;i<songs.length;i++){
-      songs[i]=checkonelocalsong(songs[i]);
      }
-     objs['songs']=songs;
+      
+     objs=JSON.parse(obj);
      code=objs['code'];
      if(code==200){
-      event.sender.send('albumlist-info',objs);
+        songs=objs['songs'];
+        for(i=0;i<songs.length;i++){
+          songs[i]=checkonelocalsong(songs[i]);
+        }
+        objs['songs']=songs;
+        event.sender.send('albumlist-info',objs);
      }
     
   }
@@ -454,45 +464,15 @@ ipc.on('output-songs',function(event,args){
       if(!fs.existsSync(listfolder)){
         fs.mkdirSync(listfolder);
       }
-      /*-------------lyric--------------------
-
-      songid=song['id'];
-      lyricfile=mp3filename.replace('.mp3','.lrc');
-      lyricfullfile=listfolder+lyricfile;
-
-      lystr=findlocallyric(songid);
-      //console.log('songid='+songid)
-      //console.log(lystr);
-      if(lystr!=''){
-        lyricobj=JSON.parse(lystr);
-        savelyric(lyricobj,lyricfullfile);
-      }
-      else{
-        var options=myserver.search('/lyric?id='+songid);
-        console.log("down id="+songid)
-        HttpRequest(options,function(obj){
-          if(obj){
-              lyricfolder=myfolders.folders['lyric'];
-              lyricfile=lyricfolder+songid;
-              
-              event.sender.send('reply-info',"save id:"+lyricfile)
-              lyricobjs=JSON.parse(obj)
-              savelyric(lyricobj,lyricfullfile);
-              event.sender.send('reply-info',"save lyric:"+lyricfullfile)
-          }
-        });
-      }
-      //--------------end lyric---------------*/
-
-
+     
       if(mp3file!=''){
         
         listfile=listfolder+mp3filename;
         coverfolder=getfullfolder(song);
         songcoverstr=coverfolder+"\\cover.jpg";
         if(!fs.existsSync(listfile)){
-          //savetags2mp3(song,songcoverstr,mp3file,listfile);
-          event.sender.send('reply-info','save mp3:'+ mp3filename)
+          savetags2mp3(song,songcoverstr,mp3file,listfile);
+          //event.sender.send('reply-info','save mp3:'+ mp3filename)
         }
         else  event.sender.send('reply-info','have mp3:'+ mp3filename)
       }
@@ -810,6 +790,10 @@ function dodown(obj,e,mp3file){
   console.log("down mp3="+mp3file)
   objs=JSON.parse(obj);
   mp3filetemp=mp3file+'.loading';
+
+  mydate=getnowtime();
+  spliter='--------------------------------------------------------------';
+
          if(objs['code']==200){
             
             mp3url=objs['data'][0]['url'];
@@ -836,10 +820,10 @@ function dodown(obj,e,mp3file){
             }
             else{
               
-                  mydate=getnowtime();
+                  
                   errorstr="Error:没有权限下载-->"+mp3file
                   console.log(errorstr);
-                  spliter='--------------------------------------------------------------';
+                  
                 fs.appendFile("./errorinfo.log",errorstr+"\r\n"+mydate+"\r\n"+spliter+"\r\n" , (error)  => {
                   if (error) return console.log("追加信息失败" + error.message);
                 
@@ -933,20 +917,46 @@ function getfullmp3file(args){
 
 
 function savetags2mp3(songarr,cover,ofile,dfile){
-  songbuffer=fs.readFileSync(mp3file);
+  songbuffer=fs.readFileSync(ofile);
   coverbuffer=fs.readFileSync(cover);
+  songid=songarr['id'];
   title=songarr['name'];
   artists=songarr['ar'];
-  var myar=new Array()
+  var myar=new Array();
   for(i=0;i<artists.length;i++){
       myar[i]=artists[i]['name'];
   }
-  album=songarr['al']['name']
-  var songwriter=new tagWriter(songbuffer);
+  albumname=songarr['al']['name']
+  albumid=songarr['al']['id']
+  
+  
+  albumyear=formatyear(songarr['publishTime'])
+  albumtrack=songarr['no'];
+  /*---------------------
+  albumfile=myfolders.folders['cache']+"\\albums\\"+albumid+'.json'
+  if(fs.existsSync(albumfile)){
+    alstr=fs.readFileSync(albumfile);
+    alarr=JSON.parse(alstr);
+    albumyear=formatyear(alarr['album']['publishTime'])
+    alsongs=alarr['songs'];
+    for(kk=0;kk<alsongs.length;kk++){
+      kid=alsongs[kk]['id'];
+      if(songid==kid){
+        mysong2=alsongs[kk];
+        break;
+      }
+    }
+    albumtrack=mysong2['no'];
 
+  }
+    //---------------------*/
+  var songwriter=new tagWriter(songbuffer);
+  console.log('albumname:'+albumname)
   songwriter.setFrame('TIT2', title)
     .setFrame('TPE1', myar)
-    .setFrame('TALB', album)
+    .setFrame('TALB', albumname)
+    .setFrame('TRCK',albumtrack)
+    .setFrame('TYER',albumyear)
     .setFrame('APIC', {
         type: 3,
         data: coverbuffer,
@@ -974,9 +984,16 @@ function savetags2mp3(songarr,cover,ofile,dfile){
     if(objs['musicId']!=='' && objs['musicId']!==undefined){
         lyricstr=objs['lyric']
     }
-    else lyricstr=objs['lrc']['lyric']
-    lyobj=lyricstr.split(' \[');
-    astr=""
+    else{
+       if(objs['lrc']!=null && objs['lrc']!=undefined){
+        lyricstr=objs['lrc']['lyric']
+       }
+       else lyricstr=""
+    }
+    
+    if(lyricstr!=''){
+      lyobj=lyricstr.split(' \[');
+      astr=""
     for(i=0;i<lyobj.length;i++){
        if(i>0) lystr="\["+lyobj[i]
        else lystr=lyobj[i];
@@ -985,5 +1002,20 @@ function savetags2mp3(songarr,cover,ofile,dfile){
        astr=astr+lystr;
     }
     fs.writeFileSync(sfile,astr);
+    }
+    
   }
+
+  function formatyear(n){
+    var date=new Date(n);
+    year=date.getFullYear();
+    /*
+    month=date.getMonth()+1;
+    day=date.getDate();
+    if(month<10) month='0'+month;
+    if(day<10) day="0"+day;
+    fullstr=year+'-'+month+'-'+day
+    */
+    return year;
+}
   
