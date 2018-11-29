@@ -16,9 +16,6 @@ const myfolders=require('./lib/myfolders.js');
 const myserver=require('./lib/myserver.js')
 
 const tagWriter = require('browser-id3-writer');
-
-
-
   function createWindow () {  
     electron.Menu.setApplicationMenu(null) 
     let win = new BrowserWindow(
@@ -209,7 +206,7 @@ ipc.on('push-audio-id',function(event,audioid){
         id=objs['data'][0]['id'];
         mp3file=".\/tempmusic\/"+id+".mp3"
         request(mp3url).pipe(fs.createWriteStream(mp3file))
-        event.sender.send('mp3url',mp3url);
+        event.sender.send('mp3url',mp3url,objs);
       }
       else event.sender.send('reply-info','没有权限播放')
       //console.log(obj);
@@ -446,32 +443,103 @@ ipc.on('get-new-lists',function(event,lasttime){
 ipc.on('output-songs',function(event,args){
  
   //mysongsstr=''
-  name1=args['title'];  
+  name1=args['name'];  
   event.sender.send('begin-output',name1)
-   
-      
       song=args;  
       listname=song['_listname'];
       mp3file=song['_localFile'];
+      mp3filename=getsongfile(song);
       listfolder=myfolders.folders['zx300']+formatfoldername(listname)+"\\"
       
       if(!fs.existsSync(listfolder)){
         fs.mkdirSync(listfolder);
       }
+      /*-------------lyric--------------------
 
-      
+      songid=song['id'];
+      lyricfile=mp3filename.replace('.mp3','.lrc');
+      lyricfullfile=listfolder+lyricfile;
+
+      lystr=findlocallyric(songid);
+      //console.log('songid='+songid)
+      //console.log(lystr);
+      if(lystr!=''){
+        lyricobj=JSON.parse(lystr);
+        savelyric(lyricobj,lyricfullfile);
+      }
+      else{
+        var options=myserver.search('/lyric?id='+songid);
+        console.log("down id="+songid)
+        HttpRequest(options,function(obj){
+          if(obj){
+              lyricfolder=myfolders.folders['lyric'];
+              lyricfile=lyricfolder+songid;
+              
+              event.sender.send('reply-info',"save id:"+lyricfile)
+              lyricobjs=JSON.parse(obj)
+              savelyric(lyricobj,lyricfullfile);
+              event.sender.send('reply-info',"save lyric:"+lyricfullfile)
+          }
+        });
+      }
+      //--------------end lyric---------------*/
+
+
       if(mp3file!=''){
-        mp3filename=getsongfile(song);
+        
         listfile=listfolder+mp3filename;
         coverfolder=getfullfolder(song);
         songcoverstr=coverfolder+"\\cover.jpg";
-        savetags2mp3(song,songcoverstr,mp3file,listfile);
-        event.sender.send('reply-info','save mp3:'+ mp3filename)
+        if(!fs.existsSync(listfile)){
+          //savetags2mp3(song,songcoverstr,mp3file,listfile);
+          event.sender.send('reply-info','save mp3:'+ mp3filename)
+        }
+        else  event.sender.send('reply-info','have mp3:'+ mp3filename)
       }
     
     event.sender.send('finish-output')
 
 })
+
+ipc.on('output-lyric',function(event,arg){
+ 
+      song=arg;  
+      listname=song['_listname'];
+      mp3filename=getsongfile(song);
+      listfolder=myfolders.folders['zx300']+formatfoldername(listname)+"\\"
+      
+      //-------------lyric--------------------
+
+      songid=song['id'];
+      lyricfile=mp3filename.replace('.mp3','.lrc');
+      lyricfullfile=listfolder+lyricfile;
+
+      lystr=findlocallyric(songid);
+      //console.log('songid='+songid)
+      //console.log(lystr);
+      if(lystr!=''){
+        lyricobj=JSON.parse(lystr);
+        savelyric(lyricobj,lyricfullfile);
+        event.sender.send('finish-lyric')
+      }
+      else{
+        var options=myserver.search('/lyric?id='+songid);
+        console.log("down id="+songid)
+        HttpRequest(options,function(obj){
+          if(obj){
+              lyricfolder=myfolders.folders['lyric'];
+              lyricfile=lyricfolder+songid;
+              fs.writeFileSync(lyricfile,obj);
+              event.sender.send('reply-info',"save id:"+lyricfile)
+              lyricobjs=JSON.parse(obj)
+              savelyric(lyricobjs,lyricfullfile);
+              event.sender.send('finish-lyric')
+          }
+        });
+      }
+      //--------------end lyric---------------*/
+})
+
 
 ipc.on('output-m3u',function(event,args){
   listname=args[0]['_listname'];
@@ -741,23 +809,39 @@ function dopic(picpath,surl){
 function dodown(obj,e,mp3file){
   console.log("down mp3="+mp3file)
   objs=JSON.parse(obj);
+  mp3filetemp=mp3file+'.loading';
          if(objs['code']==200){
             
             mp3url=objs['data'][0]['url'];
             //console.log(mp3url)
             if(mp3url!=null){
-                var stream=request(mp3url).pipe(fs.createWriteStream(mp3file));
+                var stream=request(mp3url).pipe(fs.createWriteStream(mp3filetemp));
+                    
                     stream.on('finish', function () {
-                    e.sender.send("audio-down-finish");
+                        mp3size1=fs.statSync(mp3filetemp).size;
+                        mp3size2=objs['data'][0]['size'];
+                        if(mp3size1==mp3size2){
+                            fs.renameSync(mp3filetemp,mp3file)
+                            e.sender.send("audio-down-finish");
+                        } 
+                        else{
+                            errorstr='ERR：'+mp3file+'SIZE:'+mp3size1;
+                            e.sender.send('reply-info',errorstr);
+                            fs.appendFileSync("./errorinfo.log",errorstr+"\r\n"+mydate+"\r\n"+spliter+"\r\n");
+                            
+                            fs.unlinkSync(mp3filetemp);
+                            e.sender.send("audio-down-finish");
+                        }
                     });
             }
             else{
               
                   mydate=getnowtime();
-                  errorstr="Error:没有权限下载------>"+mp3file
+                  errorstr="Error:没有权限下载-->"+mp3file
                   console.log(errorstr);
-              fs.appendFile("./errorinfo.log",errorstr+"\r\n"+mydate+"\r\n--------------------------------------------------------------\r\n" , (error)  => {
-                if (error) return console.log("追加信息失败" + error.message);
+                  spliter='--------------------------------------------------------------';
+                fs.appendFile("./errorinfo.log",errorstr+"\r\n"+mydate+"\r\n"+spliter+"\r\n" , (error)  => {
+                  if (error) return console.log("追加信息失败" + error.message);
                 
                 });
                
@@ -874,3 +958,32 @@ function savetags2mp3(songarr,cover,ofile,dfile){
   fs.writeFileSync(dfile, taggedSongBuffer);
 
   }
+
+  function findlocallyric(id){
+    lyricpath=myfolders.folders['lyric'];
+    lyricfile=lyricpath+id
+    if(fs.existsSync(lyricfile)){
+      lystr=fs.readFileSync(lyricfile,'utf-8');
+    }
+    else lystr=''
+    lystr=lystr.toString();
+    return lystr;
+  }
+  function savelyric(objs,sfile){
+    
+    if(objs['musicId']!=='' && objs['musicId']!==undefined){
+        lyricstr=objs['lyric']
+    }
+    else lyricstr=objs['lrc']['lyric']
+    lyobj=lyricstr.split(' \[');
+    astr=""
+    for(i=0;i<lyobj.length;i++){
+       if(i>0) lystr="\["+lyobj[i]
+       else lystr=lyobj[i];
+       lystr=lystr.replace(/\.(\d{2})\d\]/ig,"\.$1\]");
+       if(i<lyobj.length-1) lystr=lystr+"\r\n";
+       astr=astr+lystr;
+    }
+    fs.writeFileSync(sfile,astr);
+  }
+  
