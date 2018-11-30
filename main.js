@@ -302,7 +302,10 @@ ipc.on('audio-down',function(event,args){
       if(fs.existsSync(songfile)){
         //event.sender.send('reply-info',"have data:"+songfile);
         obj=fs.readFileSync(songfile);
-        dodown(obj,event,mp3file);
+        setTimeout(function(){
+          dodown(obj,event,mp3file);
+        },5)
+        
       }
       else{
         var options=myserver.search('/song/url?id=' + audioid)
@@ -329,6 +332,7 @@ ipc.on('audio-down',function(event,args){
 
 ipc.on('get-play-list',function(event,playlistid){
   jsfile=myfolders.folders['cache']+"playlists\\"+playlistid+'.json';
+  
   //console.log("newjsfile:"+jsfile)
   if(fs.existsSync(jsfile)){
     //event.sender.send("reply-info","find jsfile:"+jsfile);
@@ -343,6 +347,7 @@ ipc.on('get-play-list',function(event,playlistid){
       //console.log('get'+tracks[i]['_localFile']);
     }
     objs['playlist']['tracks']=tracks;
+    
     event.sender.send('playlist-info',objs);
     coverurl=playlist['coverImgUrl'];
     coverfile=myfolders.folders['playlist']+"cover-"+playlistid+".jpg";
@@ -393,7 +398,7 @@ ipc.on('get-play-list',function(event,playlistid){
 })
 
 ipc.on('get-album-list',function(event,albumlistid){
-  
+
   jsfile=myfolders.folders['cache']+"albums\\"+albumlistid+'.json';
   if(fs.existsSync(jsfile)){
     //event.sender.send("reply-info","find jsfile:"+jsfile);
@@ -439,16 +444,26 @@ ipc.on('get-album-list',function(event,albumlistid){
 }
 })
 
-ipc.on('get-new-lists',function(event,lasttime){
-  //console.log('lasttime='+lasttime)
-  if(lasttime==''){
-    var options=myserver.search("/top/playlist/highquality")
-  }
-  else{
-    var options=myserver.search("/top/playlist/highquality?before="+lasttime)
+ipc.on('get-top-lists',function(event,catname){
+  cat=encodeURI(catname)
+  
+    var options=myserver.search("/top/playlist?cat="+cat+"&limit=60")
+  
+
+  HttpRequest(options,function(obj){
+    if(obj){
+     objs=JSON.parse(obj);
+     //console.log(objs);
+     code=objs['code'];
+     if(code==200){
+      newlists=objs['playlists'];
+      console.log(newlists[0]['name'])
+      event.sender.send('return-new-lists',objs);
+     }
     
   }
-
+  });
+})
  
 ipc.on('output-songs',function(event,args){
  
@@ -482,15 +497,14 @@ ipc.on('output-songs',function(event,args){
 })
 
 ipc.on('output-lyric',function(event,arg){
- 
       song=arg;  
-      listname=song['_listname'];
-      mp3filename=getsongfile(song);
+      listname=arg['_listname'];
+      mp3filename=getsongfile(arg);
       listfolder=myfolders.folders['zx300']+formatfoldername(listname)+"\\"
       
       //-------------lyric--------------------
 
-      songid=song['id'];
+      songid=arg['id'];
       lyricfile=mp3filename.replace('.mp3','.lrc');
       lyricfullfile=listfolder+lyricfile;
 
@@ -543,20 +557,6 @@ ipc.on('output-m3u',function(event,args){
 
 })
 
-  HttpRequest(options,function(obj){
-    if(obj){
-     objs=JSON.parse(obj);
-     //console.log(objs);
-     code=objs['code'];
-     if(code==200){
-      newlists=objs['playlists'];
-      console.log(newlists[0]['name'])
-      event.sender.send('return-new-lists',objs);
-     }
-    
-  }
-  });
-})
 
 
 //=======================================================
@@ -797,19 +797,19 @@ function dodown(obj,e,mp3file){
          if(objs['code']==200){
             
             mp3url=objs['data'][0]['url'];
+            mp3size2=objs['data'][0]['size'];
             //console.log(mp3url)
             if(mp3url!=null){
                 var stream=request(mp3url).pipe(fs.createWriteStream(mp3filetemp));
                     
                     stream.on('finish', function () {
                         mp3size1=fs.statSync(mp3filetemp).size;
-                        mp3size2=objs['data'][0]['size'];
                         if(mp3size1==mp3size2){
                             fs.renameSync(mp3filetemp,mp3file)
                             e.sender.send("audio-down-finish");
                         } 
                         else{
-                            errorstr='ERR：'+mp3file+'SIZE:'+mp3size1;
+                            errorstr='ERR：'+mp3file+'SIZE:'+mp3size1+"\["+mp3size2+"\]";
                             e.sender.send('reply-info',errorstr);
                             fs.appendFileSync("./errorinfo.log",errorstr+"\r\n"+mydate+"\r\n"+spliter+"\r\n");
                             
@@ -932,24 +932,7 @@ function savetags2mp3(songarr,cover,ofile,dfile){
   
   albumyear=formatyear(songarr['publishTime'])
   albumtrack=songarr['no'];
-  /*---------------------
-  albumfile=myfolders.folders['cache']+"\\albums\\"+albumid+'.json'
-  if(fs.existsSync(albumfile)){
-    alstr=fs.readFileSync(albumfile);
-    alarr=JSON.parse(alstr);
-    albumyear=formatyear(alarr['album']['publishTime'])
-    alsongs=alarr['songs'];
-    for(kk=0;kk<alsongs.length;kk++){
-      kid=alsongs[kk]['id'];
-      if(songid==kid){
-        mysong2=alsongs[kk];
-        break;
-      }
-    }
-    albumtrack=mysong2['no'];
-
-  }
-    //---------------------*/
+  
   var songwriter=new tagWriter(songbuffer);
   console.log('albumname:'+albumname)
   songwriter.setFrame('TIT2', title)

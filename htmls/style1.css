@@ -340,7 +340,7 @@ body{
     float:left;
     width:78%;
     background-color:#FAFAFA;
-    height:calc(100% - 85px);
+    height:calc(100% - 82px);
     text-align:center;
     vertical-align: middle;
     overflow:hidden;
@@ -367,23 +367,25 @@ body{
 }
 #maindo2{
     float:left;
-    height:100%;
+    height:calc(100% - 82px);
     width:100%;
     overflow:hidden;
     text-align:center;
+    padding-left:20px;
 }
 #maindo1{
     float:left;
-    height:100%;
+    height:calc(100% - 82px);
     width:100%;
     overflow-y:scroll;
     visibility:hidden;
+    padding-left:20px;
 }
 #replyinfo{
     position:absolute;
     height:calc(100% - 110px);
     width:300;
-    left:calc(100% - 320px);
+    left:calc(100% - 310px);
     top:1;
     border:none;
     border-top:solid 1px #aaaaaa;
