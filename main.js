@@ -24,7 +24,7 @@ const tagWriter = require('browser-id3-writer');
       height:760,
       title:"Netease Music DownLoader" 
       })
-      //win.openDevTools();
+      win.openDevTools();
       win.loadURL(__dirname + '/htmls/default.html')
      
   }
@@ -190,8 +190,8 @@ ipc.on('change-uc-folder',function(event,ofolder) {
 });
 
 ipc.on('push-audio-id',function(event,audioid){
-  console.log(audioid)
-  var options=myserver.search('/song/url?id=' + audioid)
+  mypath=myserver.path['song']
+  var options=myserver.search(mypath,audioid)
     
   HttpRequest(options,function(obj){
     
@@ -241,7 +241,8 @@ ipc.on('play-one-audio',function(event,args){
               
       }
       else{
-        var options=myserver.search('/song/url?id=' + audioid)
+        mypath=myserver.path['song']
+        var options=myserver.search(mypath,audioid)
         
         HttpRequest(options,function(obj){
           if(obj){
@@ -292,32 +293,45 @@ ipc.on('audio-down',function(event,args){
     dopic(listfolder,coverurl);
     
     if(myargs['_localFile']!=''){
+      //event.sender.send("reply-info","File Exists:"+mp3file);
+      event.sender.send("audio-down-finish");
+    }
+    else if(fs.existsSync(mp3file)){
       event.sender.send("reply-info","File Exists:"+mp3file);
       event.sender.send("audio-down-finish");
     }
     else{
       //===============================
-     
+      
       songfile= myfolders.folders['cache']+'data\\'+audioid+'.json'
       if(fs.existsSync(songfile)){
         //event.sender.send('reply-info',"have data:"+songfile);
         obj=fs.readFileSync(songfile);
         setTimeout(function(){
           dodown(obj,event,mp3file);
-        },5)
+        },2)
         
       }
       else{
-        var options=myserver.search('/song/url?id=' + audioid)
+        mypath=myserver.path['song']
+        var options=myserver.search(mypath,audioid)
+        
       
       HttpRequest(options,function(obj){
         if(obj){
+         objs=JSON.parse(obj);
+         url=objs['data']['0']['url'];
+         if(url!='' && url!=null){
+           fs.writeFile(songfile,obj,function(err){
+
+           })
+         }
          dodown(obj,event,mp3file);
         }   
          else {
-          errorstr="Error:return from server------>"+mp3file;
+          errorstr="\x1B[31m"+"Error:return from server-->"+'\x1B[37m'+mp3file;
           console.log(errorstr);
-          event.sender.send('reply-info',errorstr);
+          //event.sender.send('reply-info',errorstr);
           event.sender.send("audio-down-finish");
          }  
       });
@@ -333,21 +347,22 @@ ipc.on('audio-down',function(event,args){
 ipc.on('get-play-list',function(event,playlistid){
   jsfile=myfolders.folders['cache']+"playlists\\"+playlistid+'.json';
   
-  //console.log("newjsfile:"+jsfile)
   if(fs.existsSync(jsfile)){
+    console.log("jsfile:"+jsfile)
     //event.sender.send("reply-info","find jsfile:"+jsfile);
     mystr=getfilefromlocal(jsfile);
     objs=JSON.parse(mystr);
     
     playlist=objs['playlist'];
     tracks=playlist['tracks'];
+    console.log('num='+tracks.length)
     for(i=0;i<tracks.length;i++){
       arg1=tracks[i];
       tracks[i]=checkonelocalsong(arg1);
       //console.log('get'+tracks[i]['_localFile']);
     }
     objs['playlist']['tracks']=tracks;
-    
+    console.log('get data. to render')
     event.sender.send('playlist-info',objs);
     coverurl=playlist['coverImgUrl'];
     coverfile=myfolders.folders['playlist']+"cover-"+playlistid+".jpg";
@@ -360,7 +375,9 @@ ipc.on('get-play-list',function(event,playlistid){
   }
   else{
     //-----------------------------------------
-    var options=myserver.search('/playlist/detail?id=' + playlistid)
+    console.log('\x1B[32m'+'begin to get js:'+jsfile+'\x1B[37m')
+    mypath=myserver.path['playlist']
+    var options=myserver.search(mypath,playlistid)
     
     HttpRequest(options,function(obj){
       if(obj){
@@ -413,8 +430,9 @@ ipc.on('get-album-list',function(event,albumlistid){
     event.sender.send('albumlist-info',objs);
   }
   else{
-
-  var options=myserver.search('/album?id=' + albumlistid)
+    console.log('\x1B[32m'+'begin to get album js'+jsfile+'\x1B[37m')
+      mypath=myserver.path['album']
+  var options=myserver.search(mypath,albumlistid)
 
   HttpRequest(options,function(obj){
     if(obj){
@@ -445,10 +463,10 @@ ipc.on('get-album-list',function(event,albumlistid){
 })
 
 ipc.on('get-top-lists',function(event,catname){
-  cat=encodeURI(catname)
-  
-    var options=myserver.search("/top/playlist?cat="+cat+"&limit=60")
-  
+    console.log('\x1B[33m'+'channel:'+catname+'\x1B[37m')
+    cat=encodeURI(catname)
+    mypath=myserver.path['toplist'];
+    var options=myserver.search(mypath,cat+"&limit=60")
 
   HttpRequest(options,function(obj){
     if(obj){
@@ -457,7 +475,7 @@ ipc.on('get-top-lists',function(event,catname){
      code=objs['code'];
      if(code==200){
       newlists=objs['playlists'];
-      console.log(newlists[0]['name'])
+      //console.log(newlists[0]['name'])
       event.sender.send('return-new-lists',objs);
      }
     
@@ -517,14 +535,15 @@ ipc.on('output-lyric',function(event,arg){
         event.sender.send('finish-lyric')
       }
       else{
-        var options=myserver.search('/lyric?id='+songid);
-        console.log("down id="+songid)
+        mypath=myserver.path['lyric']
+        var options=myserver.search(mypath,songid);
+        //console.log("down id="+songid)
         HttpRequest(options,function(obj){
           if(obj){
               lyricfolder=myfolders.folders['lyric'];
               lyricfile=lyricfolder+songid;
               fs.writeFileSync(lyricfile,obj);
-              event.sender.send('reply-info',"save id:"+lyricfile)
+              //event.sender.send('reply-info',"save id:"+lyricfile)
               lyricobjs=JSON.parse(obj)
               savelyric(lyricobjs,lyricfullfile);
               event.sender.send('finish-lyric')
@@ -556,7 +575,22 @@ ipc.on('output-m3u',function(event,args){
      event.sender.send("finish-m3u",listname);
 
 })
+/*--------------------------------------------
+ipc.on('get-cat-list',function(event){
+  catpath=myfolders.folders['cache']+"top\\catlist.json";
+  mypath=myserver.path['catlist'];
+  options=myserver.search(mypath,'');
+  HttpRequest(options,function(obj){
+    if(obj){
+      fs.writeFileSync(catpath,obj);
+      objs=JSON.parse(obj);
+      event.sender.send('return-cat-list',objs)
+    }
+  })
 
+
+})
+//----------------------------------------*/
 
 
 //=======================================================
@@ -714,6 +748,9 @@ function formatfoldername(s){
   s=s.replace(/\"/ig,"-")
   s=s.replace(/\?/ig,"")
   s=s.replace(/\./ig,"-")
+  s=s.replace(/\</ig,"_")
+  s=s.replace(/\>/ig,"_")
+  s=s.replace(/^\s+|\s+$/ig, '')
 }
   return s;
 
@@ -728,6 +765,9 @@ function formatfilename(s){
   s=s.replace(/\|/ig,"-")
   s=s.replace(/\"/ig,"-")
   s=s.replace(/\?/ig,"")
+  s=s.replace(/\</ig,"_")
+  s=s.replace(/\>/ig,"_")
+  s=s.replace(/^\s+|\s+$/ig, '')
   
   return s;
 
@@ -790,12 +830,10 @@ function dodown(obj,e,mp3file){
   console.log("down mp3="+mp3file)
   objs=JSON.parse(obj);
   mp3filetemp=mp3file+'.loading';
-
   mydate=getnowtime();
   spliter='--------------------------------------------------------------';
 
          if(objs['code']==200){
-            
             mp3url=objs['data'][0]['url'];
             mp3size2=objs['data'][0]['size'];
             //console.log(mp3url)
@@ -821,7 +859,7 @@ function dodown(obj,e,mp3file){
             else{
               
                   
-                  errorstr="Error:没有权限下载-->"+mp3file
+                  errorstr='\x1B[31m'+"Error:没有权限下载-->"+'\x1B[37m'+mp3file
                   console.log(errorstr);
                   
                 fs.appendFile("./errorinfo.log",errorstr+"\r\n"+mydate+"\r\n"+spliter+"\r\n" , (error)  => {
@@ -834,9 +872,9 @@ function dodown(obj,e,mp3file){
             }
          }
          else{
-          errorstr="Error:"+objs['code']+"------>"+mp3file;
+          errorstr='\x1B[31m'+"Error:"+objs['code']+"-->"+'\x1B[37m'+mp3file;
           console.log(errorstr);
-          e.sender.send('reply-info',errorstr);
+          //e.sender.send('reply-info',errorstr);
           e.sender.send("audio-down-finish");
          }
 }
@@ -934,7 +972,7 @@ function savetags2mp3(songarr,cover,ofile,dfile){
   albumtrack=songarr['no'];
   
   var songwriter=new tagWriter(songbuffer);
-  console.log('albumname:'+albumname)
+  //console.log('albumname:'+albumname)
   songwriter.setFrame('TIT2', title)
     .setFrame('TPE1', myar)
     .setFrame('TALB', albumname)

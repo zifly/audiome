@@ -340,7 +340,7 @@ body{
     float:left;
     width:78%;
     background-color:#FAFAFA;
-    height:calc(100% - 82px);
+    height:calc(100% - 80px);
     text-align:center;
     vertical-align: middle;
     overflow:hidden;
@@ -367,7 +367,7 @@ body{
 }
 #maindo2{
     float:left;
-    height:calc(100% - 82px);
+    height:calc(100% - 80px);
     width:100%;
     overflow:hidden;
     text-align:center;
@@ -385,7 +385,7 @@ body{
     position:absolute;
     height:calc(100% - 110px);
     width:300;
-    left:calc(100% - 310px);
+    left:calc(100% - 340px);
     top:1;
     border:none;
     border-top:solid 1px #aaaaaa;
@@ -396,7 +396,7 @@ body{
     padding: 5px 0.25em 2ex 2em;
     border:solid 1px whitesmoke;
     
-    z-index:-1;
+    z-index:-9999;
     background:#eeeeee;
 }
 #popwin{
@@ -412,6 +412,20 @@ body{
     text-align:center;
     font-size:12px;
 }
+
+#loadwin{
+    position:absolute;
+    width:100px;
+    height:100px;
+    left:calc(100% / 2 - 50px);
+    top:calc(100% / 2 - 150px);
+    overflow:hidden;
+    border:solid 2px whitesmoke;
+    visibility:hidden;
+    text-align:center;
+    font-size:12px;
+}
+
 
 input{
     height:30px;
